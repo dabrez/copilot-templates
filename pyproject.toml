@@ -9,15 +9,22 @@ description = "Turn a finished PowerPoint deck into a reusable template"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
+# Only what the template step needs. The analyze backends are heavy (torch,
+# a 440MB spaCy model, llama.cpp) and are declared as extras so that tests,
+# CI, and template-only users do not pay for them.
 dependencies = [
     "python-pptx==1.0.2",
-    "spacy==3.8.14",
-    "spacy-transformers==1.4.0",
-    "llama-cpp-python==0.3.22",
-    "huggingface_hub==0.36.2",
 ]
 
 [project.optional-dependencies]
+nlp = [
+    "spacy==3.8.14",
+    "spacy-transformers==1.4.0",
+]
+llm = [
+    "llama-cpp-python==0.3.22",
+    "huggingface_hub==0.36.2",
+]
 dev = ["pytest>=8.0"]
 
 [project.scripts]

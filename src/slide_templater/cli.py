@@ -1,8 +1,30 @@
 import argparse
 import sys
 from .templater import replace_text_in_presentation, load_config
-from .analyzer import analyze_presentation
-from .llm_analyzer import analyze_presentation_llm
+
+# The analyze backends are optional extras, so they are imported inside the
+# branch that uses them. Importing them here would make `template` require
+# torch and llama.cpp just to run a find-and-replace.
+_EXTRA_HINT = {
+    "nlp": "pip install 'slide-templater[nlp]'",
+    "llm": "pip install 'slide-templater[llm]'",
+}
+
+
+def _load_analyzer(method):
+    try:
+        if method == "llm":
+            from .llm_analyzer import analyze_presentation_llm
+
+            return analyze_presentation_llm
+        from .analyzer import analyze_presentation
+
+        return analyze_presentation
+    except ImportError as exc:
+        raise ImportError(
+            f"The '{method}' analyze backend is not installed. "
+            f"Install it with: {_EXTRA_HINT[method]}"
+        ) from exc
 
 def main():
     parser = argparse.ArgumentParser(description="Slide Templater - Tools for automating PowerPoint presentations.")
@@ -24,10 +46,8 @@ def main():
 
     try:
         if args.command == "analyze":
-            if args.method == "llm":
-                analyze_presentation_llm(args.input, args.output)
-            else:
-                analyze_presentation(args.input, args.output)
+            analyze = _load_analyzer(args.method)
+            analyze(args.input, args.output)
             print(f"Successfully analyzed presentation using {args.method.upper()}. Config saved to: {args.output}")
         elif args.command == "template":
             config = load_config(args.config)

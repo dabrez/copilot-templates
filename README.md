@@ -20,17 +20,25 @@ Requires Python 3.12.
 ```bash
 python3 -m venv venv
 ./venv/bin/pip install -e .
-./venv/bin/pip install -r requirements.txt   # pulls in the spaCy model
 ```
 
-This installs a `slide-templater` command into the venv.
+That is enough for the `template` command and installs a `slide-templater`
+executable into the venv.
+
+The analyze backends are optional, because they are large:
+
+```bash
+./venv/bin/pip install -e '.[nlp]'    # spaCy + torch
+./venv/bin/pip install -r requirements.txt   # and the en_core_web_trf model
+./venv/bin/pip install -e '.[llm]'    # llama.cpp + huggingface
+```
+
+`en_core_web_trf` is a ~440MB model and is not on PyPI, so it lives in
+`requirements.txt` rather than in the extras. Running `analyze` without the
+matching extra installed prints the exact command you need.
 
 For the exact environment this was developed against, use
-`requirements.lock.txt` instead.
-
-Note that `requirements.txt` pulls in `en_core_web_trf`, a ~440MB spaCy
-transformer model. It is a real dependency of the default analyze path, not
-an optional extra.
+`requirements.lock.txt`.
 
 ## Usage
 
@@ -103,6 +111,9 @@ Where two keys overlap, the longer one wins.
 ./venv/bin/pip install -e '.[dev]'
 ./venv/bin/pytest
 ```
+
+The suite needs neither analyze backend, so it runs in a few seconds. CI runs
+it on every push and pull request.
 
 ## Layout
 
