@@ -90,18 +90,19 @@ found. That case collapses the text into the first run's formatting.
 
 Not covered: speaker notes, charts, SmartArt, images, and headers/footers.
 
-## Known issues
+## Notes
 
-Replacements cascade. Keys are applied in sequence to text that earlier keys
-have already rewritten, so a config where one value contains another key
-produces the wrong result:
+Replacements are applied in a single pass, so a replacement's output is never
+rescanned by a later key. A config like
+`{"Acme Corp": "Globex", "Globex": "WRONG"}` yields `Globex`, not `WRONG`.
+Where two keys overlap, the longer one wins.
 
-```json
-{"Acme Corp": "Globex", "Globex": "WRONG"}
+## Tests
+
+```bash
+./venv/bin/pip install -e '.[dev]'
+./venv/bin/pytest
 ```
-
-yields `WRONG`, not `Globex`. Avoid configs where a replacement value is also
-a key. Bracketed placeholders like `[ORG]` do not collide in practice.
 
 ## Layout
 

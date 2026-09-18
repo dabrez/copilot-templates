@@ -1,3 +1,4 @@
+import re
 from pptx import Presentation
 import json
 import os
@@ -28,35 +29,52 @@ def replace_text_in_presentation(input_path, config, output_path):
 
     prs.save(output_path)
 
+def _apply(text, config):
+    """
+    Apply every replacement in a single pass.
+
+    Sequential str.replace calls would feed each result back into the next
+    key, so a config like {"Acme Corp": "Globex", "Globex": "WRONG"} would
+    yield "WRONG". Matching all keys in one alternation means replacement
+    output is never rescanned. Longest key first, so that an overlapping
+    shorter key cannot claim part of a longer match.
+    """
+    if not config:
+        return text
+    pattern = "|".join(
+        re.escape(k) for k in sorted(config, key=len, reverse=True) if k
+    )
+    if not pattern:
+        return text
+    return re.sub(pattern, lambda m: config[m.group(0)], text)
+
+
 def _replace_text_in_paragraph(paragraph, config):
     """
     Replace text in a paragraph, handling cases where a match spans multiple runs.
     Collapses all runs into the first run when a cross-run match is found, preserving
     the first run's formatting as the best available approximation.
     """
-    # Fast path: single-run or no match across runs
-    for run in paragraph.runs:
-        for find_text, replace_text in config.items():
-            if find_text in run.text:
-                run.text = run.text.replace(find_text, replace_text)
-
-    # Slow path: check if any key spans multiple runs
-    full_text = "".join(r.text for r in paragraph.runs)
-    needs_merge = any(k in full_text and not any(k in r.text for r in paragraph.runs)
-                      for k in config)
-    if not needs_merge:
-        return
-
-    # Apply replacements on the merged text, then put it all in the first run
-    for find_text, replace_text in config.items():
-        full_text = full_text.replace(find_text, replace_text)
-
-    from pptx.oxml.ns import qn
     runs = paragraph.runs
     if not runs:
         return
-    runs[0].text = full_text
-    # Remove extra runs from the XML
+
+    # Fast path: every match lies inside a single run, so per-run formatting
+    # survives untouched. Counting rather than testing presence matters when a
+    # key appears both intact in one run and split across a boundary -- the
+    # intact copy would otherwise mask the split one.
+    full_text = "".join(r.text for r in runs)
+    spans_runs = any(
+        full_text.count(k) > sum(r.text.count(k) for r in runs) for k in config
+    )
+    if not spans_runs:
+        for run in runs:
+            run.text = _apply(run.text, config)
+        return
+
+    # Slow path: a key straddles a run boundary, so the only way to match it
+    # is on the joined text. That costs the other runs' formatting.
+    runs[0].text = _apply(full_text, config)
     p_elem = paragraph._p
     for run in runs[1:]:
         p_elem.remove(run._r)
