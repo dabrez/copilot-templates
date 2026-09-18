@@ -1,0 +1,5 @@
+python-pptx
+spacy
+spacy-transformers
+llama-cpp-python
+huggingface_hub
