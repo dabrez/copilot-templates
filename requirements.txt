@@ -1,5 +1,15 @@
-python-pptx
-spacy
-spacy-transformers
-llama-cpp-python
-huggingface_hub
+# Direct dependencies, pinned to the versions verified working in the
+# original venv (Python 3.12.3). Transitive deps are left to the resolver;
+# see requirements.lock.txt for the exact full environment.
+python-pptx==1.0.2
+spacy==3.8.14
+spacy-transformers==1.4.0
+llama-cpp-python==0.3.22
+huggingface_hub==0.36.2
+
+# Required by `cli.py analyze --method nlp` (the default), loaded at
+# analyzer.py:18. Not on PyPI -- installed from the spaCy models release.
+en_core_web_trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.8.0/en_core_web_trf-3.8.0-py3-none-any.whl
+
+# The `--method llm` path additionally downloads bartowski/gemma-2-2b-it-GGUF
+# (~1.7GB) from Hugging Face on first run; it is cached, not vendored.
