@@ -1,5 +1,7 @@
 # Slide Templater
 
+[![tests](https://github.com/dabrez/copilot-templates/actions/workflows/tests.yml/badge.svg)](https://github.com/dabrez/copilot-templates/actions/workflows/tests.yml)
+
 Turn a finished PowerPoint deck into a reusable template. Point it at a
 `.pptx`, and it finds the things that look like they change between versions
 — client names, dates, dollar figures — and swaps them for placeholders.
