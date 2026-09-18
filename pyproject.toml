@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slide-templater"
+version = "0.1.0"
+description = "Turn a finished PowerPoint deck into a reusable template"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+dependencies = [
+    "python-pptx==1.0.2",
+    "spacy==3.8.14",
+    "spacy-transformers==1.4.0",
+    "llama-cpp-python==0.3.22",
+    "huggingface_hub==0.36.2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+slide-templater = "slide_templater.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -53,3 +53,8 @@ htmlcov/
 *.swp
 .DS_Store
 Thumbs.db
+
+# --- Packaging ---
+*.egg-link
+src/*.egg-info/
+pip-wheel-metadata/

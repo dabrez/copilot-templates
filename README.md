@@ -19,8 +19,11 @@ Requires Python 3.12.
 
 ```bash
 python3 -m venv venv
-./venv/bin/pip install -r requirements.txt
+./venv/bin/pip install -e .
+./venv/bin/pip install -r requirements.txt   # pulls in the spaCy model
 ```
+
+This installs a `slide-templater` command into the venv.
 
 For the exact environment this was developed against, use
 `requirements.lock.txt` instead.
@@ -34,7 +37,7 @@ an optional extra.
 ### Analyze
 
 ```bash
-python src/cli.py analyze --input deck.pptx --output config.json
+slide-templater analyze --input deck.pptx --output config.json
 ```
 
 Writes a JSON file mapping found text to a placeholder:
@@ -62,7 +65,7 @@ you do.
 ### Template
 
 ```bash
-python src/cli.py template --input deck.pptx --config config.json --output out.pptx
+slide-templater template --input deck.pptx --config config.json --output out.pptx
 ```
 
 Applies the config and writes a new file. The input deck is never modified.
@@ -103,11 +106,12 @@ a key. Bracketed placeholders like `[ORG]` do not collide in practice.
 ## Layout
 
 ```
-src/analyzer.py       spaCy NER backend
-src/llm_analyzer.py   Gemma backend
-src/templater.py      find-and-replace over the .pptx
-src/cli.py            argument parsing
-examples/             sample.pptx and example configs
+src/slide_templater/analyzer.py       spaCy NER backend
+src/slide_templater/llm_analyzer.py   Gemma backend
+src/slide_templater/templater.py      find-and-replace over the .pptx
+src/slide_templater/cli.py            argument parsing
+tests/                                pytest suite
+examples/                             sample.pptx and example configs
 ```
 
 ## License

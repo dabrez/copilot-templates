@@ -1,8 +1,8 @@
 import argparse
 import sys
-from templater import replace_text_in_presentation, load_config
-from analyzer import analyze_presentation
-from llm_analyzer import analyze_presentation_llm
+from .templater import replace_text_in_presentation, load_config
+from .analyzer import analyze_presentation
+from .llm_analyzer import analyze_presentation_llm
 
 def main():
     parser = argparse.ArgumentParser(description="Slide Templater - Tools for automating PowerPoint presentations.")
